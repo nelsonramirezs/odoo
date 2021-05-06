@@ -52,7 +52,6 @@ class ProductProduct(models.Model):
     def ocapi_stock(self, account):
         return self.virtual_available
 
-
 class ProductImage(models.Model):
 
     _name = "ocapi.image"

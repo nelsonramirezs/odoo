@@ -108,6 +108,9 @@ class MercadoLibreConnectionBindingProductTemplate(models.Model):
 
     meli_shipping_logistic_type = fields.Char(string="Logistic Type",index=True)
 
+    meli_shipping_mode = fields.Char(string="Shipping Mode",help="Shipping modes (por usuario): custom, not_specified, me2. https://api.mercadolibre.com/users/USERID/shipping_preferences",index=True)
+    meli_shipping_method = fields.Char(string="Shipping Method",help="Shipping methods: https://api.mercadolibre.com/sites/SITEID/shipping_methods",index=True)
+
     def product_template_post( self, context=None, meli_id=None, meli=None, account=None, product_variant=None ):
         context = context or self.env.context
         _logger.info("MercadoLibre Product template Post context: "+str(context)+" meli_id: "+str(meli_id)+" account: "+str(account))
@@ -698,6 +701,10 @@ class MercadoLibreConnectionBindingProductVariant(models.Model):
 
     meli_inventory_id = fields.Char(string="Inventory Id",index=True)
 
+    meli_shipping_mode = fields.Char(string="Shipping Mode",help="Shipping modes (por usuario): custom, not_specified, me2. https://api.mercadolibre.com/users/USERID/shipping_preferences",index=True)
+    meli_shipping_method = fields.Char(string="Shipping Method",help="Shipping methods: https://api.mercadolibre.com/sites/SITEID/shipping_methods",index=True)
+
+
     def copy_from_meli_oerp( self ):
         for bind in self:
             product = bind.product_id
@@ -800,7 +807,7 @@ class MercadoLibreConnectionBindingProductVariant(models.Model):
                 'meli_id': rjson["id"],
                 'sku': seller_sku or '',
                 'barcode': barcode or '',
-                'meli_id_variation': bind.conn_variation_id
+                'meli_id_variation': bind.conn_variation_id,
                 #'meli_imagen_link': rjson['thumbnail'],
                 #'meli_video': str(vid),
                 #'meli_dimensions': meli_dim_str,

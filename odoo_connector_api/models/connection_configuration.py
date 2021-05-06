@@ -37,6 +37,7 @@ class OcapiConnectionConfiguration(models.Model):
     name = fields.Char(string="Configuration Name")
     mode = fields.Selection([("production","Production"),("test","Test"),("disabled","Disabled")], string="Configuration Mode")
     seller_user = fields.Many2one("res.users", string="Vendedor", help="Usuario con el que se registrarán las órdenes automáticamente")
+    seller_team = fields.Many2one("crm.team", string="Equipo de venta", help="Equipo de ventas para ordenes de venta")
 
     #Import
     import_sales = fields.Boolean(string="Import sales")

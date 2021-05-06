@@ -1179,6 +1179,10 @@ class product_product(models.Model):
         product.meli_condition = product.meli_condition or product_tmpl.meli_condition
         product.meli_warranty = product.meli_warranty or product_tmpl.meli_warranty
 
+        #TODO: check
+        product.meli_shipping_mode =  product.meli_shipping_mode or product_tmpl.meli_shipping_mode
+        product.meli_shipping_method =  product.meli_shipping_method or product_tmpl.meli_shipping_method
+
         product.meli_brand = product.meli_brand or product_tmpl.meli_brand
         product.meli_model = product.meli_model or product_tmpl.meli_model
         product.meli_brand = product_tmpl.meli_brand
@@ -1292,6 +1296,22 @@ class product_product(models.Model):
             "plain_text": product.meli_description or '',
         }
 
+        #product.meli_shipping_mode and body.update({ "shipping_mode": product.meli_shipping_mode })
+        #product.meli_shipping_method and body.update({ "shipping_method": product.meli_shipping_method })
+        shipping = {
+            "mode": "not_specified",
+            #"local_pick_up": false,
+            #"free_shipping": false,
+            #"methods": [],
+            #"dimensions": null,
+            #"tags": [],
+            #"logistic_type": "not_specified",
+            #"store_pick_up": false
+        }
+        product.meli_shipping_mode and  shipping.update( { "mode": product.meli_shipping_mode })
+        product.meli_shipping_method and  shipping.update( { "methods": [ { "id": product.meli_shipping_method } ] } )
+        shipping and body.update({ "shipping": shipping })
+        _logger.info("shipping mode:"+str(shipping))
         #store id
         if config.mercadolibre_official_store_id:
             body["official_store_id"] = config.mercadolibre_official_store_id

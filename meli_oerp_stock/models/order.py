@@ -37,10 +37,12 @@ class SaleOrder(models.Model):
     def _meli_order_update( self, config=None ):
 
         for order in self:
+            order.warehouse_id = order._meli_get_warehouse_id(config=config)
             if ((order.meli_shipment and order.meli_shipment.logistic_type == "fulfillment")
                 or order.meli_shipment_logistic_type=="fulfillment"):
                 #seleccionar almacen para la orden
                 order.warehouse_id = order._meli_get_warehouse_id(config=config)
+
 
     def _meli_get_warehouse_id( self, config=None ):
 
@@ -145,3 +147,37 @@ class MercadolibreOrder(models.Model):
         #product_obj = self.env['product.product']
 
         return product_related
+
+
+    def prepare_sale_order_vals( self, meli=None, order_json=None, config=None, sale_order=None, shipment=None ):
+        meli_order_fields = super(MercadolibreOrder, self).prepare_sale_order_vals(meli=meli, order_json=order_json, config=config, sale_order=sale_order, shipment=shipment )
+
+        if ('sale.order.type' in self.env):
+            so_type_log_id = None
+            so_type_log = None
+
+            so_type_log = self.env['sale.order.type'].search([('name','like','SO-MELI')],limit=1)
+            if not so_type_log:
+                so_type_log = self.env['sale.order.type'].search([('name','like','SO-MLB')],limit=1)
+            if not so_type_log:
+                so_type_log = self.env['sale.order.type'].search([('name','like','SO-ECM')],limit=1)
+
+            logistic_type = (shipment and "logistic_type" in shipment._fields and shipment.logistic_type)
+            logistic_type = logistic_type or (sale_order and sale_order.meli_shipment_logistic_type)
+
+            if logistic_type:
+                #
+                if "fulfillment" in logistic_type:
+                    so_type_log = self.env['sale.order.type'].search([('name','like','SO-MLF')],limit=1)
+
+            so_type_log_id = so_type_log and so_type_log.id
+            meli_order_fields["type_id"] = so_type_log_id
+        _logger.info("prepare_sale_order_vals > meli_order_fields:"+str(meli_order_fields))
+        return meli_order_fields
+
+#[22:35, 30/04/2021] Clemmy: cancelled ship-delivered
+#[22:35, 30/04/2021] Clemmy: cancelled ship-not_deliveredreturned_to_hub
+#[22:35, 30/04/2021] Clemmy: cancelled ship-not_deliveredreturning_to_sender
+#[22:35, 30/04/2021] Clemmy: DEVUELTES
+#[22:36, 30/04/2021] Clemmy: ni siquiera salio
+#[22:36, 30/04/2021] Clemmy: cancelled ship-cancelled
