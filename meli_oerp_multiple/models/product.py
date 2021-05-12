@@ -1494,7 +1494,7 @@ class product_product(models.Model):
                                     var_product.meli_available_quantity = var_product._meli_available_quantity(meli=meli,config=config)
                                     vars_updated+=var_product
                             #TODO: add SKU
-                            var_attributes = var_product._update_sku_attribute( attributes=("attributes" and var_info["attributes"]), set_sku=config.mercadolibre_post_default_code)
+                            var_attributes = var_product._update_sku_attribute( attributes=("attributes" in var_info and var_info["attributes"]), set_sku=config.mercadolibre_post_default_code)
                             var = {
                                 "id": str(var_info["id"]),
                                 "price": str(product_tmpl.meli_price),
@@ -1515,7 +1515,7 @@ class product_product(models.Model):
                                 var_info = _all_variations[aix]
                                 for pvar in _new_candidates:
                                     if (pvar._is_product_combination(var_info)):
-                                        var_attributes = pvar._update_sku_attribute( attributes=("attributes" and var_info["attributes"]), set_sku=config.mercadolibre_post_default_code )
+                                        var_attributes = pvar._update_sku_attribute( attributes=("attributes" in var_info and var_info["attributes"]), set_sku=config.mercadolibre_post_default_code )
                                         var_attributes and var_info.update({"attributes": var_attributes })
                                         varias["variations"].append(var_info)
                                         _logger.info("news:")
@@ -1587,7 +1587,7 @@ class product_product(models.Model):
                         "available_quantity": product.meli_available_quantity,
                         "picture_ids": var_pics
                     }
-                    var_attributes = product._update_sku_attribute( attributes=("attributes" and var_info["attributes"]), set_sku=config.mercadolibre_post_default_code )
+                    var_attributes = product._update_sku_attribute( attributes=("attributes" in var_info and var_info["attributes"]), set_sku=config.mercadolibre_post_default_code )
                     var_attributes and var.update({"attributes": var_attributes })
                     varias["variations"].append(var)
 
