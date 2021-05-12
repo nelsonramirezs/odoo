@@ -50,7 +50,7 @@ class ResCompany(models.Model):
     #mercadolibre_stock_sku_regex = fields.Char(string="Sku Regex")
 
     #TODO: activate
-    #mercadolibre_stock_sku_mapping = fields.Text(string="Sku mapping")
+    mercadolibre_stock_sku_mapping = fields.Many2many("meli_oerp.sku.rule",string="Sku Rules")
 
     #TODO:
     #si shipped que haga automaticamente ejecute la entrega

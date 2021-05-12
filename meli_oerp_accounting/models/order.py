@@ -82,4 +82,25 @@ class SaleOrder(models.Model):
             _logger.info("Confirm Payment Exception")
             _logger.error(e, exc_info=True)
             pass
-        _logger.info("meli_oerp_accounting confirm_ml ended.")
+
+        try:
+            #en full shipment sub status "picked_up" => poner movimiento de inventario como hecha
+            if (self.meli_status_brief and "delivered" in self.meli_status_brief and self.state in ['sale','done']):
+                #entregas hechas: TODO: si es full que las confirme automaticamente
+                hechas = True
+                if self.picking_ids:
+                    for spick in self.picking_ids:
+                        hechas = hechas and spick.state in ['done']
+                #create invoice
+                if hechas:
+                    _invoices = self.action_invoice_create()
+                    if _invoices:
+                        for inv in _invoices:
+                            if inv.state in ['draft']:
+                                inv.action_invoice_open()
+                            inv.compute_charges_freight()
+                            inv.firmar_factura_electronica()
+        except Exception as e:
+            _logger.info("Error creating invoices")
+            _logger.error(e, exc_info=True)
+            pass

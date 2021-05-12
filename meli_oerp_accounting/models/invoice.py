@@ -71,11 +71,12 @@ class Invoice(models.Model):
     def firmar_factura_electronica(self):
         _logger.info("meli_oerp: firmar_factura_electronica")
         try:
-            res = super( Invoice, self ).firmar_factura_electronica()
-            sorder = self.env['sale.order'].search([('name','=',self.origin)], limit=1)
-            if sorder:
-                if sorder and sorder.meli_orders:
-                    sorder.meli_orders[0].orders_post_invoice()
+            for inv in self:
+                res = super( Invoice, inv ).firmar_factura_electronica()
+                sorder = self.env['sale.order'].search([('name','=',inv.origin)], limit=1)
+                if sorder:
+                    if sorder and sorder.meli_orders:
+                        sorder.meli_orders[0].orders_post_invoice()
 
         except Exception as e:
             raise e;

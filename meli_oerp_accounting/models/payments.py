@@ -1,6 +1,7 @@
 from odoo import fields, models, api
 from odoo.exceptions import ValidationError
 from datetime import datetime
+from odoo.addons.meli_oerp_accounting.models.versions import *
 
 class MeliPayment(models.Model):
     _inherit = 'mercadolibre.payments'
@@ -55,13 +56,13 @@ class MeliPayment(models.Model):
                 'payment_method_id': payment_method_id.id,
                 'journal_id': journal_id.id,
                 'meli_payment_id': self.id,
-                'communication': communication,
                 'currency_id': currency_id.id,
                 'partner_type': 'customer',
                 'amount': self.total_paid_amount,
                 }
+        vals_payment[acc_pay_ref] = communication
         acct_payment_id = self.env['account.payment'].create(vals_payment)
-        acct_payment_id.post()
+        payment_post( acct_payment_id )
         self.account_payment_id = acct_payment_id.id
 
     def create_supplier_payment(self):
@@ -91,13 +92,13 @@ class MeliPayment(models.Model):
                 'payment_method_id': payment_method_id.id,
                 'journal_id': journal_id.id,
                 'meli_payment_id': self.id,
-                'communication': communication,
                 'currency_id': currency_id.id,
                 'partner_type': 'supplier',
                 'amount': self.fee_amount,
                 }
+        vals_payment[acc_pay_ref] = communication
         acct_payment_id = self.env['account.payment'].create(vals_payment)
-        acct_payment_id.post()
+        payment_post( acct_payment_id )
         self.account_supplier_payment_id = acct_payment_id.id
 
     def create_supplier_payment_shipment(self):
@@ -129,13 +130,13 @@ class MeliPayment(models.Model):
                 'payment_method_id': payment_method_id.id,
                 'journal_id': journal_id.id,
                 'meli_payment_id': self.id,
-                'communication': communication,
                 'currency_id': currency_id.id,
                 'partner_type': 'supplier',
                 'amount': self.order_id.shipping_list_cost,
                 }
+        vals_payment[acc_pay_ref] = communication
         acct_payment_id = self.env['account.payment'].create(vals_payment)
-        acct_payment_id.post()
+        payment_post( acct_payment_id )
         self.account_supplier_payment_shipment_id = acct_payment_id.id
 
     account_payment_id = fields.Many2one('account.payment',string='Pago')

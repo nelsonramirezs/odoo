@@ -18,6 +18,9 @@
                       <field name="mercadolibre_stock_warehouse_full" invisible="0"/>
                       <field name="mercadolibre_stock_location_to_post_full" invisible="0"  domain = "[('mercadolibre_logistic_type','=','fulfillment'),'|',('mercadolibre_active','=',True),('company_id', '=', id)]"/>
                     </group>
+                    <group>
+                      <!--field name="mercadolibre_stock_sku_mapping" invisible="0"/-->
+                    </group>
                   </group>
                </xpath>
             </field>

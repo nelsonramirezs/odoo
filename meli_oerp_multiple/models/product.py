@@ -646,7 +646,7 @@ class product_product(models.Model):
 
         try:
             if (float(rjson['price'])>=0.0):
-                product._meli_set_product_price( product_template, rjson['price'], force_variant=force_price_for_variant )
+                product._meli_set_product_price( product_template, rjson['price'], force_variant=force_price_for_variant, config=config )
         except Exception as e:
             _logger.error(e, exc_info=True)
             rjson['price'] = 0.0
@@ -663,7 +663,7 @@ class product_product(models.Model):
 
         try:
             if (float(rjson['price'])>=0.0):
-                product._meli_set_product_price( product_template, rjson['price'] )
+                product._meli_set_product_price( product_template, rjson['price'], config=config )
         except:
             rjson['price'] = 0.0
 
