@@ -1720,7 +1720,7 @@ class product_product(models.Model):
 
         #revisar regla e precio
         product and product.set_meli_price( meli=meli, config=config)
-        target.price = product.meli_price
+        #target.price = product.meli_price
         self._product_post_set_price( product_tmpl=source, product=target, meli=meli, config=config )
 
         attributes = self._product_post_set_attributes( product_tmpl=source, product=target, meli=meli, config=config )
