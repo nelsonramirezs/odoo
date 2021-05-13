@@ -267,6 +267,13 @@ class MercadoLibreConnectionBindingProductTemplate(models.Model):
                                 #bind.stock = meli_available_quantity
                         _logger.info(ret)
                         posted_products+= 1
+                    elif (meli_id and variant.meli_id):
+                        bind = bindT and bindT.variant_bindings and bindT.variant_bindings[0]
+                        ret = variant.with_context(custom_context).product_post( bind_tpl=bindT, bind=bind, meli=meli, config=config )
+                        if ('name' in ret[0]):
+                            #return ret[0]
+                            _logger.info(ret)
+                            raise ValidationError(str(ret[0]))
                     else:
                         #if error_product_post:
                         #    _logger.info("error_product_post: "+str(error_product_post))
