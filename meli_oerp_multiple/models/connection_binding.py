@@ -274,6 +274,20 @@ class MercadoLibreConnectionBindingProductTemplate(models.Model):
                             #return ret[0]
                             _logger.info(ret)
                             raise ValidationError(str(ret[0]))
+                        if bind.meli_id:
+                            #binding is anew, set with last meli_id if we can
+                            meli_id = bind.meli_id
+                            meli_price = bind.meli_price
+                            meli_available_quantity = bind.meli_available_quantity
+                            bindT.conn_id = meli_id
+                            bindT.price = meli_price
+                            bindT.stock = meli_available_quantity
+                            for bind in bindT.variant_bindings:
+                                bind.conn_id = meli_id
+                                bind.meli_id = meli_id
+                                bind.price = meli_price
+                        _logger.info(ret)
+                        posted_products+= 1
                     else:
                         #if error_product_post:
                         #    _logger.info("error_product_post: "+str(error_product_post))
