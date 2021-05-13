@@ -858,6 +858,7 @@ class MercadoLibreConnectionBindingProductVariant(models.Model):
             account = bind.connection_account
             meli_id = bind.conn_id
             meli_id_variation = bind.conn_variation_id
+            bind_tpl = bind.binding_product_tmpl_id
 
             if not meli:
                 meli = self.env['meli.util'].get_new_instance( account.company_id, account )
@@ -866,7 +867,7 @@ class MercadoLibreConnectionBindingProductVariant(models.Model):
                 continue;
 
             if product:
-                res = product.product_post( bind=self, meli=meli, config=account.configuration )
+                res = product.product_post( bind_tpl=bind_tpl, bind=self, meli=meli, config=account.configuration )
                 result.append(res)
         _logger.info( "result: " + str(result) )
         return result
