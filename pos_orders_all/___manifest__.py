@@ -3,7 +3,7 @@
 
 {
 	"name" : "All in One POS Features in Odoo",
-	"version" : "13.0.1.8",
+	"version" : "14.0.1.8",
 	"category" : "Point of Sale",
 	'summary': 'POS all in one features pos Reorder pos Reprint pos Coupon Discount pos Order Return POS Stock pos gift pos order all pos all features pos discount pos order list print pos receipt pos item count pos bag charges import sale from pos create quote from pos',
 	"description": """
