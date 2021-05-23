@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<template id="assets_for_bi_pos_multi_shop" inherit_id="point_of_sale.assets">
+			<xpath expr="." position="inside">
+				<script type="text/javascript" src="/bi_pos_multi_shop/static/src/js/models.js"/>
+				<script type="text/javascript" src="/bi_pos_multi_shop/static/src/js/ProductsWidget.js"/>
+			</xpath>
+		</template>
+		
+	</data>
+</odoo>
