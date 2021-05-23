@@ -1,0 +1,201 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* odoo_website_sale_checkout_store
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 13.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-04-27 05:03+0000\n"
+"PO-Revision-Date: 2020-04-27 05:03+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid ""
+"<i class=\"fa fa-plus-square\"/>\n"
+"                                                                                <span>Add an address</span>"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_store
+msgid "Pickup and pay at store"
+msgstr "Zahlung im Geschäft"
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "<span class=\"fa fa-long-arrow-left\"/> Return to Cart"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_store
+msgid "Pay now and get delivery"
+msgstr "Lieferung jetzt bezahlen"
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_store
+msgid "Pay on delivery"
+msgstr "Zahlung bei Lieferung"
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_store
+msgid "Pickup at store but pay now"
+msgstr "Abholung jetzt bezahlen"
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "Billing Address"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "Billing Information"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model:ir.model.fields,field_description:odoo_website_sale_checkout_store.field_sale_order__checkout_option
+msgid "Check Out Option"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "City"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "Company Name"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model:ir.model,name:odoo_website_sale_checkout_store.model_res_config_settings
+msgid "Config Settings"
+msgstr "Konfigurationseinstellungen"
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "Confirm <span class=\"fa fa-long-arrow-right\"/>"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "Country"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "Country..."
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "Email"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model:ir.model.fields,field_description:odoo_website_sale_checkout_store.field_res_config_settings__paynow_delivery
+#: model:ir.model.fields.selection,name:odoo_website_sale_checkout_store.selection__sale_order__checkout_option__paynow_delivery
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.view_website_sale_config_settings_inherited
+msgid "Pay now and get delivery"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model:ir.model.fields,field_description:odoo_website_sale_checkout_store.field_res_config_settings__payon_delivery
+#: model:ir.model.fields.selection,name:odoo_website_sale_checkout_store.selection__sale_order__checkout_option__payon_delivery
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.view_website_sale_config_settings_inherited
+msgid "Pay on delivery"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.view_website_sale_config_settings_inherited
+msgid "Payment Option Configuration"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "Phone"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model:ir.model.fields,field_description:odoo_website_sale_checkout_store.field_sale_order__pickup_id
+msgid "Pickup Person"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model:ir.model.fields,field_description:odoo_website_sale_checkout_store.field_res_config_settings__pickup_paystore
+#: model:ir.model.fields.selection,name:odoo_website_sale_checkout_store.selection__sale_order__checkout_option__pickup_paystore
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.view_website_sale_config_settings_inherited
+msgid "Pickup and pay at store"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model:ir.model.fields,field_description:odoo_website_sale_checkout_store.field_res_config_settings__pickup_paynow
+#: model:ir.model.fields.selection,name:odoo_website_sale_checkout_store.selection__sale_order__checkout_option__pickup_paynow
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.view_website_sale_config_settings_inherited
+msgid "Pickup at store but pay now"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "Please fill Email to continue.."
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model:ir.model,name:odoo_website_sale_checkout_store.model_sale_order
+msgid "Sales Order"
+msgstr "Verkaufsauftrag"
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "Shipping Address"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "Sign in"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "State / Province"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "Street"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "VAT Number"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "Your Address"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "Your Name"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "Zip / Postal Code"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "or"
+msgstr ""
+
+#. module: odoo_website_sale_checkout_store
+#: model_terms:ir.ui.view,arch_db:odoo_website_sale_checkout_store.checkout_options
+msgid "select..."
+msgstr ""
