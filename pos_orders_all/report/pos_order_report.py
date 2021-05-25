@@ -4,8 +4,8 @@ from odoo import api, fields, models, tools
 
 class PosOrderReport(models.Model):
 	_inherit = "report.pos.order"
+
 	def _select(self):
-		
 		return """
 			SELECT
 				MIN(l.id) AS id,
@@ -42,43 +42,5 @@ class PosOrderReport(models.Model):
 
 		"""
 
-	def _from(self):
-		return """
-			FROM pos_order_line AS l
-				INNER JOIN pos_order s ON (s.id=l.order_id)
-				LEFT JOIN product_product p ON (l.product_id=p.id)
-				LEFT JOIN product_template pt ON (p.product_tmpl_id=pt.id)
-				LEFT JOIN uom_uom u ON (u.id=pt.uom_id)
-				LEFT JOIN pos_session ps ON (s.session_id=ps.id)
-		"""
-
 	def _group_by(self):
-		return """
-			GROUP BY
-				s.id, s.date_order, s.partner_id,s.state, pt.categ_id,
-				s.user_id, s.location_id, s.company_id, s.sale_journal,
-				s.pricelist_id, s.account_move, s.create_date, s.session_id,
-				l.product_id,
-				l.discount_line_type,
-				pt.categ_id, pt.pos_categ_id,
-				p.product_tmpl_id,
-				ps.config_id
-		"""
-
-	def _having(self):
-		return """
-			HAVING
-				SUM(l.qty * u.factor) != 0
-		"""
-
-	def init(self):
-		tools.drop_view_if_exists(self._cr, self._table)
-		self._cr.execute("""
-			CREATE OR REPLACE VIEW %s AS (
-				%s
-				%s
-				%s
-				%s
-			)
-		""" % (self._table, self._select(), self._from(), self._group_by(),self._having())
-		)
+		return super(PosOrderReport, self)._group_by() + ", l.discount_line_type"

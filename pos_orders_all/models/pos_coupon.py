@@ -7,88 +7,61 @@ import random
 from datetime import date, datetime
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
 
+class ProductTemp(models.Model):
+	_inherit = 'product.template'
+
+	is_coupon_product = fields.Boolean(string='Coupon Product')
 
 
 class pos_gift_coupon(models.Model):
 	_name = 'pos.gift.coupon'
 	_description = "POS Gift Coupon"
-	
+	_order = "id desc"
+
 	def print_report_coupons(self):
 		return self.env.ref('pos_orders_all.action_gift_coupons').report_action(self)
 
-
 	def existing_coupon(self,code):
-		coupon_code_record =self.search([('c_barcode', '=',code)])
-		if len(coupon_code_record) == 1:
-			coupon_record = coupon_code_record[0]
+		coupon_record =self.search([('c_barcode', '=',code)])
+		if len(coupon_record) == 1:
+			coupon_record = coupon_record[0]
 			return True
 		else:
 			return False
 		
-
 	def pos_screen_search_coupon(self, code):
-		coupon_code_record = self.search([('id', '=', code)])
-		if coupon_code_record:
-			return [coupon_code_record.id,coupon_code_record.name,coupon_code_record.expiry_date,
-					coupon_code_record.amount,coupon_code_record.issue_date,coupon_code_record.c_barcode,
-					coupon_code_record.amount_type,coupon_code_record.c_barcode_img
+		coupon_record = self.search([('id', '=', code)])
+		if coupon_record:
+			return [coupon_record.id,coupon_record.name,coupon_record.expiry_date,
+					coupon_record.amount,coupon_record.issue_date,coupon_record.c_barcode,
+					coupon_record.amount_type,coupon_record.c_barcode_img
 					]
 
 	def search_coupon(self, code):
-		coupon_code_record = self.search([('c_barcode', '=', code)])
-		if coupon_code_record:
-			return [coupon_code_record.id, coupon_code_record.amount,coupon_code_record.used, 
-					coupon_code_record.coupon_count, coupon_code_record.coupon_apply_times, 
-					coupon_code_record.expiry_date, coupon_code_record.partner_true,
-					coupon_code_record.partner_id.id,coupon_code_record.amount_type,coupon_code_record.exp_dat_show,
-					coupon_code_record.max_amount,coupon_code_record.apply_coupon_on
+		coupon_record = self.search([('c_barcode', '=', code)])
+		if coupon_record and coupon_record.product_id:
+			return [coupon_record.id, coupon_record.amount,coupon_record.used, 
+					coupon_record.coupon_count, coupon_record.coupon_apply_times, 
+					coupon_record.expiry_date, coupon_record.partner_true,
+					coupon_record.partner_id.id,coupon_record.amount_type,
+					coupon_record.exp_dat_show,coupon_record.max_amount,
+					coupon_record.apply_coupon_on,coupon_record.product_id.id,
+					coupon_record.is_categ,coupon_record.categ_ids.ids
 					]
-
-
-	@api.model
-	def default_get(self, fields):
-		pos_config_obj = self.env['pos.coupons.setting']
-		if pos_config_obj.search_count([('active', '=',True)]) !=1 :
-			raise Warning(_('Please configure gift coupons'))        
-
-		
-		rec = super(pos_gift_coupon, self).default_get(fields)
-		config_obj = self.env['pos.coupons.setting']
-		if config_obj.search_count([('active', '=',True)]) == 1:
-			config_record = config_obj.search([('active', '=', True)])[0]
-			if config_record:
-				rec.update ({
-					'amount': config_record.default_value ,
-				})              
-		return rec
+		else:
+			return []
 
 	@api.constrains('amount','exp_dat_show','issue_date','expiry_date','max_amount')
 	def _check_config(self):
-		confing_obj = self.env['pos.coupons.setting']
-		if confing_obj.search_count([('active', '=',True)]) == 1:
-			config_record = confing_obj.search([('active', '=', True)])[0]
-			if self.amount_type == 'fix':
-				if self.amount < config_record.min_coupan_value or self.amount > config_record.max_coupan_value:
-					raise Warning(_( "Amount is wrong"))
+		
+		if self.amount_type == 'fix':
+			if self.max_amount and self.amount:
+				if self.amount > self.max_amount:
+					raise Warning(_( "Coupon amount is greater than maximum amount"))
 
-			if self.max_amount  > config_record.max_coupan_value:
-					raise Warning(_( "Maximum Amount is greater than maximum amount of coupon configuration"))
-
-			if not config_record.max_exp_date and self.exp_dat_show:
-				raise Warning(_( "Please add expiry date in coupon configuration"))
-
-			if self.expiry_date and self.issue_date:
-				if self.expiry_date < self.issue_date:
-					raise Warning(_( "Please Enter Valid Date.Expiry Date Should not be greater than Issue Date."))
-
-			if config_record.max_exp_date:
-				if self.expiry_date:
-					if self.expiry_date > config_record.max_exp_date:
-						raise Warning(_( "Please Enter Valid Date.Expiry Date is greater than maximum expiry date of coupon configuration"))
-
-				if self.issue_date > config_record.max_exp_date:
-					raise Warning(_( "Please Enter Valid Date.Issue Date is greater than maximum expiry date of coupon configuration."))
-
+		if self.expiry_date and self.issue_date:
+			if self.expiry_date < self.issue_date:
+				raise Warning(_( "Please Enter Valid Date.Expiry Date Should not be greater than Issue Date."))
 
 	@api.model
 	def search_user(self):
@@ -102,11 +75,13 @@ class pos_gift_coupon(models.Model):
 	def create_coupon_from_ui(self,data):
 		coup_obj = self.env['pos.gift.coupon']
 		amt_type = False
+		apply_coupon_on = data['apply_coupon_on']
 
 		if data['c_am_type'] == 'Fixed':
 			amt_type = 'fix'
 		else:
 			amt_type = 'per'
+			
 
 		if data['c_expdt_box']:
 			exp_check_box = True
@@ -122,8 +97,14 @@ class pos_gift_coupon(models.Model):
 			cust_check_box = False
 			customer_select = False 
 
+		categ = []
+		if data.get('coupon_categ'):
+			for c in data.get('coupon_categ'):
+				categ.append(int(c))
+
 		vals = {
 			'name':data['c_name'],
+			'product_id' :  int(data['c_product']),
 			'coupon_apply_times':data['c_limit'],
 			'issue_date':data['c_issue_dt'],
 			'amount':data['c_amount'],
@@ -134,51 +115,31 @@ class pos_gift_coupon(models.Model):
 			'partner_true':cust_check_box,
 			'max_amount':data['coupon_max_amount'],
 			'active': True,
-			'user_id' :data['user_id']['id'],
+			'apply_coupon_on':apply_coupon_on,
+			'user_id' :self.env.user.id,
 		}
+		if categ:
+			vals.update({
+				'is_categ': True,
+				'categ_ids': [(6,0,categ)]
+				})
+
 		res = coup_obj.sudo().create(vals)
-		# return res.id
 		return  [res.id,res.name,res.expiry_date,res.amount,res.issue_date,
 				res.c_barcode,res.amount_type,res.c_barcode_img]
 
 	@api.model
 	def create(self, vals):
 		rec = super(pos_gift_coupon,self).create(vals)
-		pos_config_obj = self.env['pos.coupons.setting']
-		if pos_config_obj.search_count([('active', '=',True)]) !=1 :
-			raise Warning(_('Please configure gift coupons'))
-		else:
-			code =(random.randrange(1111111111111,9999999999999))
-
-			# coupen_barcode = self.env['barcode.nomenclature'].sanitize_ean("%s" % (code))
-			rec.write({'c_barcode':str(code)})
-
-			# if ImageWriter != None:
-			# 	encode = barcode.get('ean13', coupen_barcode, writer=ImageWriter())
-			# 	if os.path.exists("/tmp"):
-			# 		filename = encode.save('/tmp/ean13')
-			# 	else:
-			# 		filename = encode.save('ean13')
-			# 	file = open(filename, 'rb')
-			# 	jpgdata = file.read()
-			# 	imgdata = base64.encodestring(jpgdata)
-			# 	rec.write({'c_barcode_img':imgdata})
-			# 	os.remove(filename)
-
-			if pos_config_obj.search_count([('active', '=',True)]) == 1:
-				config_record = pos_config_obj.search([('active', '=', True)])[0]
-				if config_record.default_availability != -1:
-					if self.search_count([]) == config_record.default_availability:
-						raise Warning(_('You can only create %d coupons  ') %  config_record.default_availability )                         
-				config_record = config_record.search([('active', '=', True)])[0]
-				if config_record:
-					rec.update({'expiry_date':config_record.max_exp_date})
-
+		code =(random.randrange(1111111111111,9999999999999))
+		rec.write({'c_barcode':str(code)})
 		return rec
 		
 
 		
 	name  = fields.Char('Name')
+	product_id  = fields.Many2one('product.product', domain = [('type', '=', 'service'),
+		('available_in_pos', '=', True),('is_coupon_product', '=', True)],string='Product')
 	c_barcode = fields.Char(string="Coupon Barcode")
 	c_barcode_img = fields.Binary('Coupon Barcode Image')
 	user_id  =  fields.Many2one('res.users' ,'Created By',default  = lambda self: self.env.user)
@@ -199,7 +160,8 @@ class pos_gift_coupon(models.Model):
 	coupon_desc = fields.Text('Description')
 	apply_coupon_on = fields.Selection([('taxed','Taxed Amount'),
 		('untaxed','Untaxed Amount')],default='taxed',string="Apply Coupon on")
-
+	is_categ = fields.Boolean('Allow for Specific Category')
+	categ_ids =  fields.Many2many('pos.category' ,string='POS Categories')
 	
 	
 
