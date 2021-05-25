@@ -51,58 +51,40 @@ class AccountInvoiceInherit(models.Model):
 			move = base_line.move_id
 
 			if move.is_invoice(include_receipts=True):
+				handle_price_include = True
 				sign = -1 if move.is_inbound() else 1
 				quantity = base_line.quantity
+				is_refund = move.move_type in ('out_refund', 'in_refund')
 				line_discount = base_line.price_unit * (1 - (base_line.discount / 100.0))
+				if base_line.pos_order_id and base_line.pos_order_id.discount_type  == "Fixed":
+					line_discount = base_line.price_unit - base_line.discount
 
-				if base_line.pos_order_id :
-					if base_line.pos_order_id.discount_type  == "Fixed":
-						line_discount = base_line.price_unit - base_line.discount
-
-				if base_line.currency_id:
-					price_unit_foreign_curr = sign * line_discount
-					price_unit_comp_curr = base_line.currency_id._convert(price_unit_foreign_curr, move.company_id.currency_id, move.company_id, move.date)
-				else:
-					price_unit_foreign_curr = 0.0
-					price_unit_comp_curr = sign * line_discount
-			else:
-				quantity = 1.0
-				price_unit_foreign_curr = base_line.amount_currency
-				price_unit_comp_curr = base_line.balance
-
-			if move.is_invoice(include_receipts=True):
-				handle_price_include = True
+				price_unit_wo_discount = sign * line_discount
 			else:
 				handle_price_include = False
+				quantity = 1.0
+				tax_type = base_line.tax_ids[0].type_tax_use if base_line.tax_ids else None
+				is_refund = (tax_type == 'sale' and base_line.debit) or (tax_type == 'purchase' and base_line.credit)
+				price_unit_wo_discount = base_line.balance
 
 			balance_taxes_res = base_line.tax_ids._origin.compute_all(
-				price_unit_comp_curr,
-				currency=base_line.company_currency_id,
+				price_unit_wo_discount,
+				currency=base_line.currency_id,
 				quantity=quantity,
 				product=base_line.product_id,
 				partner=base_line.partner_id,
-				is_refund=self.type in ('out_refund', 'in_refund'),
+				is_refund=is_refund,
 				handle_price_include=handle_price_include,
 			)
 
-			if base_line.currency_id:
-				# Multi-currencies mode: Taxes are computed both in company's currency / foreign currency.
-				amount_currency_taxes_res = base_line.tax_ids._origin.compute_all(
-					price_unit_foreign_curr,
-					currency=base_line.currency_id,
-					quantity=quantity,
-					product=base_line.product_id,
-					partner=base_line.partner_id,
-					is_refund=self.type in ('out_refund', 'in_refund'),
-				)
-				for b_tax_res, ac_tax_res in zip(balance_taxes_res['taxes'], amount_currency_taxes_res['taxes']):
-					tax = self.env['account.tax'].browse(b_tax_res['id'])
-					b_tax_res['amount_currency'] = ac_tax_res['amount']
-
-					# A tax having a fixed amount must be converted into the company currency when dealing with a
-					# foreign currency.
-					if tax.amount_type == 'fixed':
-						b_tax_res['amount'] = base_line.currency_id._convert(b_tax_res['amount'], move.company_id.currency_id, move.company_id, move.date)
+			if move.move_type == 'entry':
+				repartition_field = is_refund and 'refund_repartition_line_ids' or 'invoice_repartition_line_ids'
+				repartition_tags = base_line.tax_ids.mapped(repartition_field).filtered(lambda x: x.repartition_type == 'base').tag_ids
+				tags_need_inversion = (tax_type == 'sale' and not is_refund) or (tax_type == 'purchase' and is_refund)
+				if tags_need_inversion:
+					balance_taxes_res['base_tags'] = base_line._revert_signed_tags(repartition_tags).ids
+					for tax_res in balance_taxes_res['taxes']:
+						tax_res['tag_ids'] = base_line._revert_signed_tags(self.env['account.account.tag'].browse(tax_res['tag_ids'])).ids
 
 			return balance_taxes_res
 
@@ -120,8 +102,7 @@ class AccountInvoiceInherit(models.Model):
 			else:
 				taxes_map[grouping_key] = {
 					'tax_line': line,
-					'balance': 0.0,
-					'amount_currency': 0.0,
+					'amount': 0.0,
 					'tax_base_amount': 0.0,
 					'grouping_dict': False,
 				}
@@ -131,13 +112,13 @@ class AccountInvoiceInherit(models.Model):
 		for line in self.line_ids.filtered(lambda line: not line.tax_repartition_line_id):
 			# Don't call compute_all if there is no tax.
 			if not line.tax_ids:
-				line.tag_ids = [(5, 0, 0)]
+				line.tax_tag_ids = [(5, 0, 0)]
 				continue
 
 			compute_all_vals = _compute_base_line_taxes(line)
 
 			# Assign tags on base line
-			line.tag_ids = compute_all_vals['base_tags']
+			line.tax_tag_ids = compute_all_vals['base_tags']
 
 			tax_exigible = True
 			for tax_vals in compute_all_vals['taxes']:
@@ -152,56 +133,67 @@ class AccountInvoiceInherit(models.Model):
 
 				taxes_map_entry = taxes_map.setdefault(grouping_key, {
 					'tax_line': None,
-					'balance': 0.0,
-					'amount_currency': 0.0,
+					'amount': 0.0,
 					'tax_base_amount': 0.0,
 					'grouping_dict': False,
 				})
-				taxes_map_entry['balance'] += tax_vals['amount']
-				taxes_map_entry['amount_currency'] += tax_vals.get('amount_currency', 0.0)
-				taxes_map_entry['tax_base_amount'] += tax_vals['base']
+				taxes_map_entry['amount'] += tax_vals['amount']
+				taxes_map_entry['tax_base_amount'] += self._get_base_amount_to_display(tax_vals['base'], tax_repartition_line)
 				taxes_map_entry['grouping_dict'] = grouping_dict
 			line.tax_exigible = tax_exigible
 
 		# ==== Process taxes_map ====
 		for taxes_map_entry in taxes_map.values():
-			# Don't create tax lines with zero balance.
-			if self.currency_id.is_zero(taxes_map_entry['balance']) and self.currency_id.is_zero(taxes_map_entry['amount_currency']):
-				taxes_map_entry['grouping_dict'] = False
-
-			tax_line = taxes_map_entry['tax_line']
-			tax_base_amount = -taxes_map_entry['tax_base_amount'] if self.is_inbound() else taxes_map_entry['tax_base_amount']
-
-			if not tax_line and not taxes_map_entry['grouping_dict']:
+			# The tax line is no longer used in any base lines, drop it.
+			if taxes_map_entry['tax_line'] and not taxes_map_entry['grouping_dict']:
+				self.line_ids -= taxes_map_entry['tax_line']
 				continue
-			elif tax_line and recompute_tax_base_amount:
-				tax_line.tax_base_amount = tax_base_amount
-			elif tax_line and not taxes_map_entry['grouping_dict']:
-				# The tax line is no longer used, drop it.
-				self.line_ids -= tax_line
-			elif tax_line:
-				tax_line.update({
-					'amount_currency': taxes_map_entry['amount_currency'],
-					'debit': taxes_map_entry['balance'] > 0.0 and taxes_map_entry['balance'] or 0.0,
-					'credit': taxes_map_entry['balance'] < 0.0 and -taxes_map_entry['balance'] or 0.0,
-					'tax_base_amount': tax_base_amount,
-				})
+
+			currency = self.env['res.currency'].browse(taxes_map_entry['grouping_dict']['currency_id'])
+
+			# Don't create tax lines with zero balance.
+			if currency.is_zero(taxes_map_entry['amount']):
+				if taxes_map_entry['tax_line']:
+					self.line_ids -= taxes_map_entry['tax_line']
+				continue
+
+			# tax_base_amount field is expressed using the company currency.
+			tax_base_amount = currency._convert(taxes_map_entry['tax_base_amount'], self.company_currency_id, self.company_id, self.date or fields.Date.context_today(self))
+
+			# Recompute only the tax_base_amount.
+			if taxes_map_entry['tax_line'] and recompute_tax_base_amount:
+				taxes_map_entry['tax_line'].tax_base_amount = tax_base_amount
+				continue
+
+			balance = currency._convert(
+				taxes_map_entry['amount'],
+				self.journal_id.company_id.currency_id,
+				self.journal_id.company_id,
+				self.date or fields.Date.context_today(self),
+			)
+			to_write_on_line = {
+				'amount_currency': taxes_map_entry['amount'],
+				'currency_id': taxes_map_entry['grouping_dict']['currency_id'],
+				'debit': balance > 0.0 and balance or 0.0,
+				'credit': balance < 0.0 and -balance or 0.0,
+				'tax_base_amount': tax_base_amount,
+			}
+
+			if taxes_map_entry['tax_line']:
+				# Update an existing tax line.
+				taxes_map_entry['tax_line'].update(to_write_on_line)
 			else:
 				create_method = in_draft_mode and self.env['account.move.line'].new or self.env['account.move.line'].create
 				tax_repartition_line_id = taxes_map_entry['grouping_dict']['tax_repartition_line_id']
 				tax_repartition_line = self.env['account.tax.repartition.line'].browse(tax_repartition_line_id)
 				tax = tax_repartition_line.invoice_tax_id or tax_repartition_line.refund_tax_id
-				tax_line = create_method({
+				taxes_map_entry['tax_line'] = create_method({
+					**to_write_on_line,
 					'name': tax.name,
 					'move_id': self.id,
 					'partner_id': line.partner_id.id,
 					'company_id': line.company_id.id,
 					'company_currency_id': line.company_currency_id.id,
-					'quantity': 1.0,
-					'date_maturity': False,
-					'amount_currency': taxes_map_entry['amount_currency'],
-					'debit': taxes_map_entry['balance'] > 0.0 and taxes_map_entry['balance'] or 0.0,
-					'credit': taxes_map_entry['balance'] < 0.0 and -taxes_map_entry['balance'] or 0.0,
 					'tax_base_amount': tax_base_amount,
 					'exclude_from_invoice_tab': True,
 					'tax_exigible': tax.tax_exigibility == 'on_invoice',
@@ -209,8 +201,7 @@ class AccountInvoiceInherit(models.Model):
 				})
 
 			if in_draft_mode:
-				tax_line._onchange_amount_currency()
-				tax_line._onchange_balance()
+				taxes_map_entry['tax_line'].update(taxes_map_entry['tax_line']._get_fields_onchange_balance(force_computation=True))
 
 
 class AccountInvoiceLineInherit(models.Model):
@@ -219,6 +210,7 @@ class AccountInvoiceLineInherit(models.Model):
 	pos_order_id = fields.Many2one('pos.order',string="POS order")
 	pos_order_line_id = fields.Many2one('pos.order.line',string="POS order Line")
 	discount_line_type = fields.Char(related = 'pos_order_line_id.discount_line_type',string='Discount Type',readonly=True,store=True)
+
 
 	@api.model
 	def _get_price_total_and_subtotal_model(self, price_unit, quantity, discount, currency, product, partner, taxes, move_type):
@@ -235,12 +227,12 @@ class AccountInvoiceLineInherit(models.Model):
 		:return:            A dictionary containing 'price_subtotal' & 'price_total'.
 		'''
 		res = {}
-
 		# Compute 'price_subtotal'.
 		if self.discount_line_type and self.discount_line_type == "Fixed":
 			price_unit_wo_discount = price_unit - discount
 		else:
 			price_unit_wo_discount = price_unit * (1 - (discount / 100.0))
+
 		subtotal = quantity * price_unit_wo_discount
 
 		# Compute 'price_total'.
@@ -251,11 +243,8 @@ class AccountInvoiceLineInherit(models.Model):
 			res['price_total'] = taxes_res['total_included']
 		else:
 			res['price_total'] = res['price_subtotal'] = subtotal
-		#In case of multi currency, round before it's use for computing debit credit
-		if currency:
-			res = {k: currency.round(v) for k, v in res.items()}
-		return res
 
+		return res
 
 	
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:   

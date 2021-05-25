@@ -11,6 +11,7 @@ class PosDiscount(models.Model):
 	description = fields.Text("Description")
 	available_pos_ids = fields.Many2many('pos.session', 'pos_session_discount', 'pos_discount_id', string='Available in POS')
 	
+
 class PosConfig(models.Model):
 	_inherit = 'pos.config'
 	

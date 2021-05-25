@@ -1,114 +1,181 @@
+.ms-options-wrap,
+.ms-options-wrap * {
+    box-sizing: border-box;
+}
 
-
-.reorder-product-list {
+.ms-options-wrap > button:focus,
+.ms-options-wrap > button {
+    position: relative;
     width: 100%;
-    table-layout: fixed;
+    text-align: left;
+    border: 1px solid #aaa;
+    background-color: #fff;
+    padding: 5px 20px 5px 5px;
+    margin-top: 1px;
+    font-size: 13px;
+    color: #aaa;
+    outline-offset: -2px;
+    white-space: nowrap;
 }
 
-.reorder_product_header {
-    background-color: #7f82ac;
-    color: #fff;
-    height: 40px;
+.ms-options-wrap > button > span {
+    display: inline-block;
 }
 
-.reorder_product_body {
-    height: 40px;
+.ms-options-wrap > button[disabled] {
+    background-color: #e5e9ed;
+    color: #808080;
+    opacity: 0.6;
 }
 
-#entered_item_qty {
-	height: 35px;
-	width: 30%;
-	min-height: 0px;
-}
-
-.reorder-product-list-contents {
-    display: block;
-    height: 190px;
-    width: 468px;
-    overflow-y: scroll;
-}    
-
-.pos .clientlist-screen .searchbox {
-    left: 37% !important;
-}
-.pos .clientlist-screen .button.new-customer {
-    margin-left: 10px;
-}
-
-
-
-.return-product-list {
-    width: 100%;
-    table-layout: fixed;
-}
-
-.return_product_header {
-    background-color: #7f82ac;
-    color: #fff;
-    height: 40px;
-}
-
-.return_product_body {
-    height: 40px;
-}
-
-#entered_item_qty {
-	height: 35px;
-	width: 30%;
-	min-height: 0px;
-}
-
-.return-product-list-contents {
-    display: block;
-    height: 190px;
-    width: 468px;
-    overflow-y: scroll;
-}    
-
-/* bi_pos_custom_discount custom css */
-.product-name1 {
+.ms-options-wrap > button:after {
+    content: ' ';
+    height: 0;
     position: absolute;
-    -webkit-box-sizing: border-box;
-       -moz-box-sizing: border-box;
-        -ms-box-sizing: border-box;
-            box-sizing: border-box;
-    bottom:1;
-    top:5;
-    line-height: 14px;
-    width:100%;
+    top: 50%;
+    right: 5px;
+    width: 0;
+    border: 6px solid rgba(0, 0, 0, 0);
+    border-top-color: #999;
+    margin-top: -3px;
+}
+
+.ms-options-wrap.ms-has-selections {
+    display: grid;
+    min-height: 40px;
+}
+
+.ms-options-wrap.ms-has-selections > button {
+    color: #333;
+}
+
+.ms-options-wrap > .ms-options {
+    position: absolute;
+    left: 0;
+    top: 45%;
+    width: 100%;
+    margin-top: 1px;
+    margin-bottom: 20px;
+    background: white;
+    z-index: 2000;
+    border: 1px solid #aaa;
+    overflow: auto;
+    visibility: hidden;
+}
+
+.ms-options-wrap.ms-active > .ms-options {
+    visibility: visible
+}
+
+.ms-options-wrap > .ms-options > .ms-search input {
+    width: 100%;
+    padding: 4px 5px;
+    border: none;
+    border-bottom: 1px groove;
+    outline: none;
+    font-size: 14px;
+    min-height: 30px !important;
+    max-height: 30px !important;
+}
+
+.ms-options-wrap > .ms-options .ms-selectall {
+    display: inline-block;
+    font-size: .9em;
+    text-transform: lowercase;
+    text-decoration: none;
+}
+.ms-options-wrap > .ms-options .ms-selectall:hover {
+    text-decoration: underline;
+}
+
+.ms-options-wrap > .ms-options > .ms-selectall.global {
+    margin: 4px 5px;
+}
+
+.ms-options-wrap > .ms-options > ul,
+.ms-options-wrap > .ms-options > ul > li.optgroup ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ms-options-wrap > .ms-options > ul li.ms-hidden {
+    display: none;
+}
+
+.ms-options-wrap > .ms-options > ul > li.optgroup {
+    padding: 5px;
+}
+.ms-options-wrap > .ms-options > ul > li.optgroup + li.optgroup {
+    border-top: 1px solid #aaa;
+}
+
+.ms-options-wrap > .ms-options > ul > li.optgroup .label {
+    display: block;
+    padding: 5px 0 0 0;
+    font-weight: bold;
+}
+
+.ms-options-wrap > .ms-options > ul label {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    padding: 7px 7px 7px 30px;
+    margin: 2px 0;
+    font-size: 14px;
+}
+.ms-options-wrap > .ms-options.checkbox-autofit > ul label,
+.ms-options-wrap > .ms-options.hide-checkbox > ul label {
+    padding: 4px;
+}
+
+.ms-options-wrap > .ms-options > ul label.focused,
+.ms-options-wrap > .ms-options > ul label:hover {
+    background-color: #efefef;
+    border-color: #999;
+}
+
+.ms-options-wrap > .ms-options > ul li.selected label {
+    background-color: #efefef;
+    border-color: transparent;
+}
+
+.ms-options-wrap > .ms-options > ul input[type="checkbox"] {
+    margin: 0 5px 0 0;
+    position: absolute;
+    max-width: 10%;
+    margin-left: 60%;
+    min-height: 15px !important;
+    box-shadow: none;
+}
+
+.ms-options-wrap > .ms-options.hide-checkbox > ul input[type="checkbox"] {
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
     overflow: hidden;
-    font-size: 15px;
-    text-overflow: ellipsis;
-    background: -webkit-linear-gradient(-90deg,rgba(255,255,255,0),rgba(255,255,255,1), rgba(255,255,255,1));
-    background:    -moz-linear-gradient(-90deg,rgba(255,255,255,0),rgba(255,255,255,1), rgba(255,255,255,1));
-    background:     -ms-linear-gradient(-90deg,rgba(255,255,255,0),rgba(255,255,255,1), rgba(255,255,255,1));
-    padding: 3px;
-    padding-top:10px;
-    color:blue;
+    clip: rect(1px 1px 1px 1px);
+    clip: rect(1px, 1px, 1px, 1px);
 }
-
-.price-tag-new {
-    right: 95px;
-    position: absolute;
-    top: 2px;
-    /* right: 2px; */
-    vertical-align: top;
-    color: white;
-    line-height: 13px;
-    background: #7f82ac;
-    padding: 2px 5px;
-    border-radius: 2px;
+.pos .popup .body li:before{
+    content: '';
+    position: relative;
+    font-size: 0.6em;
+    left: -1em;
+    bottom: 0.2em;
+}
+.pos .popup .body li {
+    text-indent: 0px;
 }
 
 
+.control-button{
+    background: #875a7b !important;
+    color: white !important;
+}
 
-
-
-
-
-
-
-
-
-
-
+.odoo-theme-button{
+    background: #875a7b !important;
+    color: white !important;
+    font-size: 14px !important;
+}
