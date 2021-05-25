@@ -3,7 +3,11 @@
 
 {
 	"name" : "All in One POS Features in Odoo",
+<<<<<<< HEAD
 	"version" : "14.0.1.3",
+=======
+	"version" : "14.0.1.8",
+>>>>>>> d8e612c32c171df08341bde559e8d19ab1204e48
 	"category" : "Point of Sale",
 	'summary': 'POS all in one features pos Reorder pos Reprint pos Coupon Discount pos Order Return POS Stock pos gift pos order all pos all features pos discount pos order list print pos receipt pos item count pos bag charges import sale from pos create quote from pos',
 	"description": """
@@ -192,6 +196,7 @@ odoo Create Sales Order from Point of Sale Create SO from POS Create sales from 
 	""",
 	"author": "BrowseInfo",
 	"depends" : ['base','sale_management','account','point_of_sale'],
+<<<<<<< HEAD
 	"price": 109,
 	"currency": 'EUR',
 	"website" : "https://www.browseinfo.in",
@@ -214,6 +219,25 @@ odoo Create Sales Order from Point of Sale Create SO from POS Create sales from 
 		'static/src/xml/pos_discount.xml',
 		'static/src/xml/pos_stock.xml',
 		'static/src/xml/gift_coupon_voucher.xml',
+=======
+	"price": 89,
+	"currency": 'EUR',
+	"website" : "www.browseinfo.in",
+	"data": [
+		'security/ir.model.access.csv',
+		'views/custom_pos_view.xml',
+		'data/data.xml',
+		'views/gift_coupon_report.xml',
+		'views/pos_gift_coupon.xml',
+		'views/pos_gift_voucher_setting.xml',
+		'views/pos_order_view.xml',
+		'views/report_pos_gift_coupon.xml',
+		'views/pos_custom_discount_view.xml',
+		'views/pos_barcode.xml',
+	],
+	'qweb': [
+		'static/src/xml/pos_orders_all.xml',
+>>>>>>> d8e612c32c171df08341bde559e8d19ab1204e48
 	],
 	"auto_install": False,
 	"installable": True,
