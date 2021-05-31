@@ -34,9 +34,10 @@ import requests
 
 
 class stock_move(models.Model):
-    
+
     _inherit = "stock.move"
-    
+
+    #cancel_backorder parameter is present in odoo version >= 13.0
     def _action_done(self, cancel_backorder=None ):
         context = self.env.context
         #_logger.info("context: "+str(context))
@@ -48,25 +49,25 @@ class stock_move(models.Model):
         for st in self:
             #_logger.info("Moved products, put all this product stock state on batch for inmediate update: #"+str(len(st.product_id))+" >> "+str(st.product_id.ids) )
             for p in st.product_id:
-                _logger.info("post stock for: "+p.display_name)                
-        
-    
+                _logger.info("post stock for: "+p.display_name)
+
+
 class stock_location(models.Model):
-    
+
     _inherit = "stock.location"
-    
+
     mercadolibre_active = fields.Boolean(string="Ubicacion activa para MercadoLibre",index=True)
     mercadolibre_logistic_type = fields.Char(string="Logistic Type Asociado",index=True)
-    
+
 class DeliveryCarrier(models.Model):
-    
+
     _inherit = "delivery.carrier"
-    
+
     ml_tracking_url = fields.Char(string="Default tracking url")
-    
+
     def get_tracking_link(self, picking):
         if self.ml_tracking_url and picking and picking.carrier_tracking_ref:
             return self.ml_tracking_url+str(picking.carrier_tracking_ref)
-            
+
         return super(DeliveryCarrier, self).get_tracking_link(picking)
     

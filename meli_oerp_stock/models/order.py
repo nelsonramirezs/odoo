@@ -144,7 +144,7 @@ class MercadolibreOrder(models.Model):
         return odoo_sku
 
     #extended from mercadolibre.orders: SKU formulas
-    def _search_meli_product( self, meli=None, meli_item=None, config=None ):
+    def search_meli_product( self, meli=None, meli_item=None, config=None ):
         _logger.info("search_meli_product extended: "+str(meli_item))
         product_related = super(MercadolibreOrder, self).search_meli_product( meli=meli, meli_item=meli_item, config=config )
 

@@ -121,7 +121,7 @@ class product_product(models.Model):
         #_logger.info("meli_oerp_stock._meli_virtual_available quant_obj: "+str(quant_obj)+" product_id:"+str(product_id))
         for loc in loc_id:
             #if company.mercadolibre_stock_virtual_available=='virtual':
-            _logger.info(loc_id.display_name)
+            _logger.info(loc.display_name)
             if 1==1:
                 qty_available+= quant_obj._get_available_quantity(product_id, loc)
             else:
