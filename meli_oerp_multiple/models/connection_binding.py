@@ -1242,7 +1242,7 @@ class MercadoLibreConnectionBindingSaleOrderShipmentItem(models.Model):
 
     _name = "mercadolibre.shipment.item"
     _description = "Ocapi Sale Order Shipment Item"
-    _inherit = ["ocapi.binding.shipment.item, mercadolibre.shipment.item"]
+    _inherit = ["ocapi.binding.shipment.item", "mercadolibre.shipment.item"]
 
     connection_account = fields.Many2one( "mercadolibre.account", string="MercadoLibre Account" )
     shipping_id = fields.Many2one("mercadolibre.bind_shipment",string="Shipment")
