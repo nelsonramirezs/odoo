@@ -140,7 +140,24 @@ class MercadoLibreOrder(models.Model):
             order_fields["company_id"] = company.id
             #order_fields['seller_id'] = seller_id,
 
+        _logger.info("prepare_ml_order_vals (multiple) > order_fields:"+str(order_fields))
+
         return order_fields
+        
+    def prepare_sale_order_vals( self, meli=None, order_json=None, config=None, sale_order=None, shipment=None ):
+
+        meli_order_fields = super(MercadoLibreOrder, self).prepare_sale_order_vals(meli=meli, order_json=order_json, config=config,sale_order=sale_order, shipment=shipment)
+
+        if config and config.accounts:
+            account = config.accounts[0]
+            company = account.company_id
+
+            meli_order_fields["company_id"] = company.id
+            #order_fields['seller_id'] = seller_id,
+
+        _logger.info("prepare_sale_order_vals (multiple) > meli_order_fields:"+str(meli_order_fields))
+
+        return meli_order_fields
 
     def search_meli_product( self, meli=None, meli_item=None, config=None ):
 
