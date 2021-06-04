@@ -826,16 +826,26 @@ class MercadoLibreConnectionAccount(models.Model):
 
         if (config.mercadolibre_cron_post_update_stock):
             auto_commit = not getattr(threading.currentThread(), 'testing', False)
-            product_bind_ids = self.env['mercadolibre.product'].search([
+            product_bind_ids_null = self.env['mercadolibre.product'].search([
                 #('meli_pub','=',True),
                 #('meli_id','!=',False),
-                ('connection_account', '=', account.id )
+                ('connection_account', '=', account.id ),
+                ('stock_update','=',False),
+                #'|',('company_id','=',False),('company_id','=',company.id)
+                ], order='id asc')
+            product_bind_ids_not_null = self.env['mercadolibre.product'].search([
+                #('meli_pub','=',True),
+                #('meli_id','!=',False),
+                ('connection_account', '=', account.id ),
+                ('stock_update','!=',False)
                 #'|',('company_id','=',False),('company_id','=',company.id)
                 ], order='stock_update asc')
+            product_bind_ids = product_bind_ids_null + product_bind_ids_not_null
             _logger.info("product_bind_ids stock to update:" + str(product_bind_ids))
             _logger.info("account updating stock #" + str(len(product_bind_ids)) + " on " + str(account.name))
             icommit = 0
             icount = 0
+            topcommits = 120
             maxcommits = len(product_bind_ids)
             internals = {
                 "application_id": account.client_id,
@@ -854,7 +864,7 @@ class MercadoLibreConnectionAccount(models.Model):
                 for bind in product_bind_ids:
                     obj = bind #.product_id
                     #_logger.info( "Product check if active: " + str(obj.id)+ ' meli_id:'+str(obj.meli_id)  )
-                    if (obj and obj.meli_id):
+                    if (obj and obj.meli_id and icount<=topcommits):
                         icommit+= 1
                         icount+= 1
                         try:
@@ -865,7 +875,7 @@ class MercadoLibreConnectionAccount(models.Model):
                                 errors+= str(obj.sku)+" "+str(obj.meli_id)+" >> "+str(resjson)+"\n"
                             #obj.stock_update = ml_datetime( str( datetime.now() ) )
 
-                            if ((icommit==40 or (icount==maxcommits)) and 1==1):
+                            if ((icommit==40 or (icount==maxcommits) or (icount==topcommits)) and 1==1):
                                 noti.processing_errors = errors
                                 noti.processing_logs = logs
                                 noti.resource = "meli_update_remote_stock #"+str(icount) +'/'+str(maxcommits)
