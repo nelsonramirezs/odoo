@@ -71,7 +71,7 @@ class MeliUtilMultiple(models.AbstractModel):
     @api.model
     def get_new_instance(self, company=None, account=None):
 
-        _logger.info("MeliUtilMultiple.get_new_instance: " + str(account) )
+        #_logger.info("MeliUtilMultiple.get_new_instance: " + str(account) )
 
         if not account:
             _logger.info("no account: " + str(account) )
