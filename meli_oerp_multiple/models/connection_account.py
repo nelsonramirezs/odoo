@@ -809,7 +809,7 @@ class MercadoLibreConnectionAccount(models.Model):
                 self._cr.rollback()
         return {}
 
-    def meli_update_remote_products(self,postnew=False):
+    def meli_update_remote_products( self, post_new=False ):
         #
         _logger.info("meli_update_remote_products")
 
