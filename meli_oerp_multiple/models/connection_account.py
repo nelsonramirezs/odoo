@@ -845,7 +845,7 @@ class MercadoLibreConnectionAccount(models.Model):
             _logger.info("account updating stock #" + str(len(product_bind_ids)) + " on " + str(account.name))
             icommit = 0
             icount = 0
-            topcommits = 120
+            topcommits = 40
             maxcommits = len(product_bind_ids)
             internals = {
                 "application_id": account.client_id,
